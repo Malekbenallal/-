@@ -94,3 +94,39 @@ score = tf.nn.softmax(predictions[0])
 print("На изображении скорее всего {} ({:.2f}% вероятность)".format(
 	class_names[np.argmax(score)],
 	100 * np.max(score)))
+
+
+
+from sklearn.metrics import precision_recall_curve, precision_score, recall_score, f1_score, confusion_matrix
+
+# Получение меток и предсказаний для всей валидации
+y_true = []
+y_pred = []
+
+for images, labels in val_ds:
+    predictions = model.predict(images)
+    predicted_labels = np.argmax(predictions, axis=1)
+    y_true.extend(labels.numpy())
+    y_pred.extend(predicted_labels)
+
+# Преобразуем в массивы numpy
+y_true = np.array(y_true)
+y_pred = np.array(y_pred)
+
+# Рассчитаем precision, recall и f1-score для всех классов
+precision = precision_score(y_true, y_pred, average=None)
+recall = recall_score(y_true, y_pred, average=None)
+f1 = f1_score(y_true, y_pred, average=None)
+
+# Печать результатов для каждого класса
+for i, class_name in enumerate(class_names):
+    print(f"Class: {class_name}")
+    print(f"Precision: {precision[i]:.4f}")
+    print(f"Recall: {recall[i]:.4f}")
+    print(f"F1 Score: {f1[i]:.4f}")
+    print()
+
+# Если хотите вывести confusion matrix
+cm = confusion_matrix(y_true, y_pred)
+print("Confusion Matrix:")
+print(cm)
